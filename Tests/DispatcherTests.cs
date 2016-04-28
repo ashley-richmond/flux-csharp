@@ -24,7 +24,7 @@ namespace Flux.Tests
             Dispatcher dispatcher = new Dispatcher();
             dispatcher.Register(p =>
             {
-                Assert.IsTrue(p.Type == typeof(int));
+                Assert.IsTrue(p.Type == typeof(int) && (int)p.Data == 3);
             });
 
             Payload payload = new Payload("", 3);
