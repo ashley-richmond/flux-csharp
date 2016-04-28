@@ -1,44 +1,56 @@
-﻿using Flux.Interfaces;
+﻿using Flux.Payloads;
 using System;
 using System.Collections.Generic;
 
 namespace Flux
 {
-    public class Dispatcher : IDispatcher
+    public class Dispatcher
     {
-        protected Dictionary<IDispatchToken, Action<IPayload<Object>>> callbackRegistry = new Dictionary<IDispatchToken, Action<IPayload<Object>>>();
+        protected Dictionary<DispatchToken, Action<IPayload>> callbackRegistry = new Dictionary<DispatchToken, Action<IPayload>>();
         protected int lastId = 0;
-        protected IPayload<Object> currentPayload = null;
-        protected List<IDispatchToken> isPending = new List<IDispatchToken>();
-        protected List<IDispatchToken> isHandled = new List<IDispatchToken>();
+        protected IPayload currentPayload = null;
+        protected List<DispatchToken> isPending = new List<DispatchToken>();
+        protected List<DispatchToken> isHandled = new List<DispatchToken>();
+
+        public Dispatcher Instance { get; protected set; }
 
         public bool IsDispatching { get; protected set; }
 
-        public IDispatchToken Register(Action<IPayload<Object>> callback)
+        public Dispatcher()
         {
-            IDispatchToken dispatchToken = new DispatchToken(lastId++);
+            Instance = this;
+        }
+
+        public DispatchToken Register(Action<IPayload> callback)
+        {
+            DispatchToken dispatchToken = new DispatchToken(lastId++);
             callbackRegistry.Add(dispatchToken, callback);
             return dispatchToken;
         }
 
-        public void Deregister(IDispatchToken dispatchToken)
+        public void Deregister(DispatchToken dispatchToken)
         {
-            if (!callbackRegistry.ContainsKey(dispatchToken))
-                throw new Exceptions.Dispatcher.InvalidCallbackException();
+            if (!HasRegistered(dispatchToken))
+                throw new DispatcherExceptions.InvalidCallbackException();
 
             callbackRegistry.Remove(dispatchToken);
         }
 
-        public void Dispatch(IPayload<Object> payload)
+        public bool HasRegistered(DispatchToken dispatchToken)
+        {
+            return dispatchToken != null && callbackRegistry.ContainsKey(dispatchToken);
+        }
+
+        public void Dispatch(IPayload payload)
         {
             if (IsDispatching)
-                throw new Exceptions.Dispatcher.AlreadyDispatchingException();
+                throw new DispatcherExceptions.AlreadyDispatchingException();
 
             startDispatching(payload);
 
             try
             {
-                foreach (KeyValuePair<IDispatchToken, Action<IPayload<Object>>> callback in callbackRegistry)
+                foreach (KeyValuePair<DispatchToken, Action<IPayload>> callback in callbackRegistry)
                 {
                     if (isPending.Contains(callback.Key))
                         continue;
@@ -52,9 +64,9 @@ namespace Flux
             }
         }
 
-        protected void startDispatching(IPayload<Object> payload) {
-            isPending = new List<IDispatchToken>();
-            isHandled = new List<IDispatchToken>();
+        protected void startDispatching(IPayload payload) {
+            isPending = new List<DispatchToken>();
+            isHandled = new List<DispatchToken>();
             currentPayload = payload;
             IsDispatching = true;
         }
@@ -65,32 +77,28 @@ namespace Flux
             IsDispatching = false;
         }
 
-        public void WaitFor(List<IDispatchToken> dispatchTokenList)
+        public void WaitFor(List<DispatchToken> dispatchTokenList)
         {
             if (!IsDispatching)
-                throw new Exceptions.Dispatcher.NotDispatchingException();
+                throw new DispatcherExceptions.NotDispatchingException();
 
-            dispatchTokenList.ForEach((IDispatchToken dispatchToken) =>
+            dispatchTokenList.ForEach((DispatchToken dispatchToken) =>
             {
-                if (isPending.Contains(dispatchToken)) {
-                    if (isHandled.Contains(dispatchToken))
-                        throw new Exceptions.Dispatcher.CircularDependecyException();
-
-                    return;
-                }
+                if (isPending.Contains(dispatchToken) || isHandled.Contains(dispatchToken))
+                    throw new DispatcherExceptions.CircularDependecyException();
 
                 if (!callbackRegistry.ContainsKey(dispatchToken))
-                    throw new Exceptions.Dispatcher.InvalidCallbackException();
+                    throw new DispatcherExceptions.InvalidCallbackException();
 
                 invokeCallback(dispatchToken);
             });
         }
-        public void WaitFor(IDispatchToken dispatchToken)
+        public void WaitFor(DispatchToken dispatchToken)
         {
-            WaitFor(new List<IDispatchToken>() { dispatchToken });
+            WaitFor(new List<DispatchToken>() { dispatchToken });
         }
 
-        protected void invokeCallback(IDispatchToken dispatchToken)
+        protected void invokeCallback(DispatchToken dispatchToken)
         {
             isPending.Add(dispatchToken);
             callbackRegistry[dispatchToken](currentPayload);

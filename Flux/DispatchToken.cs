@@ -1,10 +1,10 @@
-﻿using Flux.Interfaces;
+﻿using Flux;
 
 namespace Flux
 {
-    class DispatchToken : IDispatchToken
+    public sealed class DispatchToken
     {
-        public int Id { get; protected set; }
+        public int Id { get; private set; }
 
         public DispatchToken(int id)
         {
