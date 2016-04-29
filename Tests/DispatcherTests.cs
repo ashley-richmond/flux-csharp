@@ -21,15 +21,19 @@ namespace Flux.Tests
         [TestMethod]
         public void Dispatcher_OnDispatch_DeliversPayload()
         {
+            bool received = false;
+
             Dispatcher dispatcher = new Dispatcher();
             dispatcher.Register(p =>
             {
-                Assert.IsTrue(p.Type == typeof(int) && (int)p.Data == 3);
+                received = true;
             });
 
             Payload payload = new Payload("", 3);
 
             dispatcher.Dispatch(payload);
+
+            Assert.IsTrue(received);
         }
 
         [TestMethod]
@@ -77,6 +81,21 @@ namespace Flux.Tests
             });
 
             dispatcher.Dispatch(new Payload("", 4));
+        }
+
+        [TestMethod]
+        public void Dispatcher_OnFinishDispatch_EnablesDispatch()
+        {
+            int dispatchCounter = 0;
+
+            Dispatcher dispatcher = new Dispatcher();
+
+            DispatchToken dispatchToken = dispatcher.Register(p => { dispatchCounter++; });
+
+            dispatcher.Dispatch(new Payload("", 0));
+            dispatcher.Dispatch(new Payload("", 1));
+
+            Assert.AreEqual(dispatchCounter, 2);
         }
 
         [TestMethod]
