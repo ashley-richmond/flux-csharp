@@ -1,14 +1,15 @@
 ﻿using Flux;
+using System;
 
 namespace Flux
 {
     public sealed class DispatchToken
     {
-        public int Id { get; private set; }
+        public Guid Id { get; private set; }
 
-        public DispatchToken(int id)
+        public DispatchToken()
         {
-            Id = id;
+            Id = Guid.NewGuid();
         }
     }
 }

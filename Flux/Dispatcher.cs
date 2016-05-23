@@ -7,7 +7,6 @@ namespace Flux
     public class Dispatcher
     {
         protected Dictionary<DispatchToken, Action<IPayload>> callbackRegistry = new Dictionary<DispatchToken, Action<IPayload>>();
-        protected int lastId = 0;
         protected IPayload currentPayload = null;
         protected List<DispatchToken> isPending = new List<DispatchToken>();
         protected List<DispatchToken> isHandled = new List<DispatchToken>();
@@ -23,7 +22,7 @@ namespace Flux
 
         public DispatchToken Register(Action<IPayload> callback)
         {
-            DispatchToken dispatchToken = new DispatchToken(lastId++);
+            DispatchToken dispatchToken = new DispatchToken();
             callbackRegistry.Add(dispatchToken, callback);
             return dispatchToken;
         }
