@@ -55,7 +55,7 @@ namespace Flux.Tests
 
             store.AddListener(EventType.Change, testListener);
 
-            dispatcher.Dispatch(new Payload("wat", 4));
+            store.ReceiveAction(new Payload("test", true));
 
             Assert.IsTrue(listenerHit);
         }

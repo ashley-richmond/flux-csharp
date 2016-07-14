@@ -11,9 +11,22 @@ namespace Flux
         protected List<DispatchToken> isPending = new List<DispatchToken>();
         protected List<DispatchToken> isHandled = new List<DispatchToken>();
 
-        public Dispatcher Instance { get; protected set; }
-
         public bool IsDispatching { get; protected set; }
+
+        public static Dispatcher Instance
+        {
+            get {
+                if (instance == null)
+                    instance = new Dispatcher();
+
+                return instance;
+            }
+            protected set {
+                instance = value;
+            }
+        }
+
+        private static Dispatcher instance;
 
         public Dispatcher()
         {
