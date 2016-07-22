@@ -1,9 +1,7 @@
-﻿using System;
+﻿using Flux.Payloads;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Flux;
-using Flux.Payloads;
 
 namespace Flux.Stores
 {
@@ -22,14 +20,51 @@ namespace Flux.Stores
         }
 
         public DispatchToken DispatchToken { get; protected set; }
-        public Dispatcher Dispatcher { get; protected set; }
+        
+        public Dispatcher Dispatcher {
+            get
+            {
+                if (_dispatcher == null)
+                    throw new DispatcherNotSetException();
+
+                return _dispatcher;
+            }
+            set
+            {
+                if (_dispatcher != null)
+                    Dispose();
+
+                _dispatcher = value;
+                DispatchToken = _dispatcher.Register(ReceiveAction);
+            }
+        }
+
+        protected Dispatcher _dispatcher;
+
+        protected static IStore _instance;
 
         private List<Listener> listeners = new List<Listener>();
 
-        public Store(Dispatcher dispatcher)
+        public static T Factory<T>(Dispatcher dispatcher) where T : IStore, new()
         {
-            Dispatcher = dispatcher;
-            DispatchToken = Dispatcher.Instance.Register(ReceiveAction);
+            T instance = new T();
+            instance.Dispatcher = dispatcher;
+            return instance;
+        }
+
+        public static T SingletonFactory<T>(Dispatcher dispatcher) where T : IStore, new()
+        {
+            if (_instance == null)
+            {
+                _instance = new T();
+                _instance.Dispatcher = dispatcher;
+            }
+
+            return (T)_instance;
+        }
+
+        protected Store()
+        {
         }
 
         ~Store()

@@ -13,24 +13,8 @@ namespace Flux
 
         public bool IsDispatching { get; protected set; }
 
-        public static Dispatcher Instance
-        {
-            get {
-                if (instance == null)
-                    instance = new Dispatcher();
-
-                return instance;
-            }
-            protected set {
-                instance = value;
-            }
-        }
-
-        private static Dispatcher instance;
-
         public Dispatcher()
         {
-            Instance = this;
         }
 
         public DispatchToken Register(Action<IPayload> callback)

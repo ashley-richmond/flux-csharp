@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Payloads\Payload.cs" />
+    <Compile Include="Stores\DispatcherNotSetException.cs" />
     <Compile Include="Stores\EventType.cs" />
     <Compile Include="Stores\Store.cs" />
     <Compile Include="Dispatcher.cs" />

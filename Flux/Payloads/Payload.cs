@@ -9,13 +9,16 @@ namespace Flux.Payloads
     public class Payload : IPayload
     {
         public string Action { get; protected set; }
-        public object Data { get; protected set; }
-        public Type Type { get; protected set; }
+        protected object _data;
 
         public Payload(string action, object data) {
             Action = action;
-            Data = data;
-            Type = data.GetType();
+            _data = data;
+        }
+
+        public T Data<T>()
+        {
+            return (T)_data;
         }
     }
 }

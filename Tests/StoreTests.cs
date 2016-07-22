@@ -10,10 +10,6 @@ namespace Flux.Tests
     {
         private class TestStore : Store
         {
-            public TestStore(Dispatcher dispatcher) : base(dispatcher)
-            {
-            }
-
             public override void ReceiveAction(IPayload payload)
             {
                 Emit(EventType.Change);
@@ -24,7 +20,7 @@ namespace Flux.Tests
         public void Store_OnInstantiation_RegistersCallback ()
         {
             Dispatcher dispatcher = new Dispatcher();
-            TestStore store = new TestStore(dispatcher);
+            TestStore store = Store.Factory<TestStore>(dispatcher);
 
             Assert.IsTrue(dispatcher.HasRegistered(store.DispatchToken));
         }
@@ -33,7 +29,7 @@ namespace Flux.Tests
         public void Store_OnDisposal_DeregistersCallback ()
         {
             Dispatcher dispatcher = new Dispatcher();
-            TestStore store = new TestStore(dispatcher);
+            TestStore store = Store.Factory<TestStore>(dispatcher);
             DispatchToken token = store.DispatchToken;
             store.Dispose();
 
@@ -44,7 +40,7 @@ namespace Flux.Tests
         public void Store_OnRecievePayload_EmitsEvent ()
         {
             Dispatcher dispatcher = new Dispatcher();
-            TestStore store = new TestStore(dispatcher);
+            TestStore store = Store.Factory<TestStore>(dispatcher);
 
             bool listenerHit = false;
 
@@ -64,7 +60,7 @@ namespace Flux.Tests
         public void Store_OnRemoveListener_RemovesListener ()
         {
             Dispatcher dispatcher = new Dispatcher();
-            TestStore store = new TestStore(dispatcher);
+            TestStore store = Store.Factory<TestStore>(dispatcher);
 
             int listenerHit = 0;
 

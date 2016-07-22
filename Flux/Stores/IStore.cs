@@ -5,7 +5,7 @@ namespace Flux.Stores
 {
     public interface IStore: IDisposable
     {
-        Dispatcher Dispatcher { get; }
+        Dispatcher Dispatcher { get; set; }
         DispatchToken DispatchToken { get; }
         void ReceiveAction(IPayload payload);
 
