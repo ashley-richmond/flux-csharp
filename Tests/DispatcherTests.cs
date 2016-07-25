@@ -19,6 +19,13 @@ namespace Flux.Tests
         }
 
         [TestMethod]
+        public void Dispatch_CanTakeTwoArgs()
+        {
+            Dispatcher dispatcher = new Dispatcher();
+            dispatcher.Dispatch("Whatup", true);
+        }
+
+        [TestMethod]
         public void Dispatcher_OnDispatch_DeliversPayload()
         {
             bool received = false;
