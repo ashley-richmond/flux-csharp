@@ -73,6 +73,11 @@ namespace Flux
                 stopDispatching();
             }
         }
+        /// <summary>
+        /// Sends a payload to all registered callbacks.
+        /// </summary>
+        /// <param name="action"></param>
+        /// <param name="data"></param>
         public void Dispatch(string action, object data)
         {
             Dispatch(new Payload(action, data));
