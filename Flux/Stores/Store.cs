@@ -77,8 +77,16 @@ namespace Flux.Stores
             Dispatcher.Deregister(DispatchToken);
         }
 
+        /// <summary>
+        /// Handles receiving a payload from the dispatcher.
+        /// </summary>
+        /// <param name="payload"></param>
         public abstract void ReceiveAction(IPayload payload);
 
+        /// <summary>
+        /// Triggers the callbacks listening to the given event type.
+        /// </summary>
+        /// <param name="type"></param>
         protected void Emit(EventType type)
         {
             listeners
@@ -87,17 +95,51 @@ namespace Flux.Stores
                 .ForEach(listener => listener.Action());
         }
 
+        /// <summary>
+        /// Triggers the callbacks listening to the change event.
+        /// </summary>
+        protected void EmitChange()
+        {
+            Emit(EventType.Change);
+        }
+
+        /// <summary>
+        /// Adds a listener on a given store event.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="callback"></param>
         public void AddListener(EventType type, Action callback)
         {
             listeners.Add(new Listener(type, callback));
         }
+        /// <summary>
+        /// Adds a listener on the store's change event.
+        /// </summary>
+        /// <param name="callback"></param>
+        public void AddListener(Action callback)
+        {
+            AddListener(EventType.Change, callback);
+        }
 
+        /// <summary>
+        /// Removes a listener assigned to the given store event.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="callback"></param>
         public void RemoveListener(EventType type, Action callback)
         {
             listeners
                 .Where(listener => listener.Type == type && listener.Action == callback)
                 .ToList()
                 .ForEach(listener => listeners.Remove(listener));
+        }
+        /// <summary>
+        /// Removes a listener assigned to the store's change event.
+        /// </summary>
+        /// <param name="callback"></param>
+        public void RemoveListener(Action callback)
+        {
+            RemoveListener(EventType.Change, callback);
         }
     }
 }
