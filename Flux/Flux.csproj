@@ -30,6 +30,10 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -43,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Payloads\Payload.cs" />
+    <Compile Include="Stores\DispatcherNotSetException.cs" />
     <Compile Include="Stores\EventType.cs" />
     <Compile Include="Stores\Store.cs" />
     <Compile Include="Dispatcher.cs" />
@@ -53,7 +58,9 @@
     <Compile Include="DispatcherExceptions\NotDispatchingException.cs" />
     <Compile Include="Payloads\IPayload.cs" />
     <Compile Include="Stores\IStore.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

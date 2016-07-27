@@ -13,26 +13,19 @@ namespace Flux
 
         public bool IsDispatching { get; protected set; }
 
-        public static Dispatcher Instance
+        public string Version
         {
-            get {
-                if (instance == null)
-                    instance = new Dispatcher();
-
-                return instance;
-            }
-            protected set {
-                instance = value;
+            get
+            {
+                return System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
             }
         }
 
-        private static Dispatcher instance;
-
-        public Dispatcher()
-        {
-            Instance = this;
-        }
-
+        /// <summary>
+        /// Registers a callback to receive dispatched messages.
+        /// </summary>
+        /// <param name="callback"></param>
+        /// <returns></returns>
         public DispatchToken Register(Action<IPayload> callback)
         {
             DispatchToken dispatchToken = new DispatchToken();
@@ -40,6 +33,10 @@ namespace Flux
             return dispatchToken;
         }
 
+        /// <summary>
+        /// Removes a callback from the registry.
+        /// </summary>
+        /// <param name="dispatchToken"></param>
         public void Deregister(DispatchToken dispatchToken)
         {
             if (!HasRegistered(dispatchToken))
@@ -48,11 +45,20 @@ namespace Flux
             callbackRegistry.Remove(dispatchToken);
         }
 
+        /// <summary>
+        /// Checks if the given dispatch token exists in the callback registry.
+        /// </summary>
+        /// <param name="dispatchToken"></param>
+        /// <returns></returns>
         public bool HasRegistered(DispatchToken dispatchToken)
         {
             return dispatchToken != null && callbackRegistry.ContainsKey(dispatchToken);
         }
 
+        /// <summary>
+        /// Sends a payload to all registered callbacks.
+        /// </summary>
+        /// <param name="payload"></param>
         public void Dispatch(IPayload payload)
         {
             if (IsDispatching)
@@ -75,7 +81,20 @@ namespace Flux
                 stopDispatching();
             }
         }
+        /// <summary>
+        /// Sends a payload to all registered callbacks.
+        /// </summary>
+        /// <param name="action"></param>
+        /// <param name="data"></param>
+        public void Dispatch(string action, object data)
+        {
+            Dispatch(new Payload(action, data));
+        }
 
+        /// <summary>
+        /// Initiates the dispatch process.
+        /// </summary>
+        /// <param name="payload"></param>
         protected void startDispatching(IPayload payload) {
             isPending = new List<DispatchToken>();
             isHandled = new List<DispatchToken>();
@@ -83,12 +102,19 @@ namespace Flux
             IsDispatching = true;
         }
 
+        /// <summary>
+        /// Finalises the dispatch process.
+        /// </summary>
         protected void stopDispatching()
         {
             currentPayload = null;
             IsDispatching = false;
         }
 
+        /// <summary>
+        /// Allows a callback to wait for another callback to complete.
+        /// </summary>
+        /// <param name="dispatchTokenList"></param>
         public void WaitFor(List<DispatchToken> dispatchTokenList)
         {
             if (!IsDispatching)
@@ -110,6 +136,10 @@ namespace Flux
             WaitFor(new List<DispatchToken>() { dispatchToken });
         }
 
+        /// <summary>
+        /// Invokes a given callback by its dispatch token.
+        /// </summary>
+        /// <param name="dispatchToken"></param>
         protected void invokeCallback(DispatchToken dispatchToken)
         {
             isPending.Add(dispatchToken);
