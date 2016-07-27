@@ -13,6 +13,14 @@ namespace Flux
 
         public bool IsDispatching { get; protected set; }
 
+        public string Version
+        {
+            get
+            {
+                return System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            }
+        }
+
         /// <summary>
         /// Registers a callback to receive dispatched messages.
         /// </summary>
