@@ -41,10 +41,16 @@ namespace Flux.Stores
 
         protected Dispatcher _dispatcher;
 
-        protected static IStore _instance;
+        protected static Dictionary<Type, IStore> _instances = new Dictionary<Type, IStore>();
 
         private List<Listener> listeners = new List<Listener>();
 
+        /// <summary>
+        /// Create a new instance of the given store type.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dispatcher"></param>
+        /// <returns></returns>
         public static T Factory<T>(Dispatcher dispatcher) where T : IStore, new()
         {
             T instance = new T();
@@ -52,15 +58,20 @@ namespace Flux.Stores
             return instance;
         }
 
+        /// <summary>
+        /// Create or retrieve an instance of the given store type.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dispatcher"></param>
+        /// <returns></returns>
         public static T SingletonFactory<T>(Dispatcher dispatcher) where T : IStore, new()
         {
-            if (_instance == null)
-            {
-                _instance = new T();
-                _instance.Dispatcher = dispatcher;
-            }
+            Type type = typeof(T);
 
-            return (T)_instance;
+            if (!_instances.ContainsKey(type))
+                _instances.Add(type, Factory<T>(dispatcher));
+
+            return (T)_instances[type];
         }
 
         protected Store()
