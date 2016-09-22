@@ -90,6 +90,14 @@ namespace Flux
         {
             Dispatch(new Payload(action, data));
         }
+        /// <summary>
+        /// Sends an empty action to all registered callbacks.
+        /// </summary>
+        /// <param name="action"></param>
+        public void Dispatch(string action)
+        {
+            Dispatch(new Payload(action, null));
+        }
 
         /// <summary>
         /// Initiates the dispatch process.
