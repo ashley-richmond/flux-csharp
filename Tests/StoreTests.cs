@@ -10,9 +10,16 @@ namespace Flux.Tests
     {
         private class TestStore : Store
         {
+            public bool SetupChecker = false;
+
             public override void ReceiveAction(IPayload payload)
             {
                 Emit(EventType.Change);
+            }
+
+            protected override void Setup()
+            {
+                SetupChecker = true;
             }
         }
 
@@ -23,6 +30,15 @@ namespace Flux.Tests
             TestStore store = Store.Factory<TestStore>(dispatcher);
 
             Assert.IsTrue(dispatcher.HasRegistered(store.DispatchToken));
+        }
+
+        [TestMethod]
+        public void Store_OnInstantiation_RunsSetupMethod()
+        {
+            Dispatcher dispatcher = new Dispatcher();
+            TestStore store = Store.Factory<TestStore>(dispatcher);
+
+            Assert.IsTrue(store.SetupChecker);
         }
 
         [TestMethod]
