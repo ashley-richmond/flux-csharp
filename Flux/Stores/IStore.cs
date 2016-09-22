@@ -9,7 +9,9 @@ namespace Flux.Stores
         DispatchToken DispatchToken { get; }
         void ReceiveAction(IPayload payload);
 
+        void AddListener(Action callback);
         void AddListener(EventType type, Action callback);
+        void RemoveListener(Action callback);
         void RemoveListener(EventType type, Action callback);
     }
 }

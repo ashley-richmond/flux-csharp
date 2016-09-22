@@ -76,6 +76,7 @@ namespace Flux.Stores
 
         protected Store()
         {
+            Setup();
         }
 
         ~Store()
@@ -87,6 +88,11 @@ namespace Flux.Stores
         {
             Dispatcher.Deregister(DispatchToken);
         }
+
+        /// <summary>
+        /// Provides the facility for stores to intialise, while maintaining the protected constructor.
+        /// </summary>
+        protected virtual void Setup() { }
 
         /// <summary>
         /// Handles receiving a payload from the dispatcher.

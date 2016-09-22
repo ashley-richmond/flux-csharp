@@ -20,5 +20,13 @@ namespace Flux.Payloads
         {
             return (T)_data;
         }
+
+        public T Data<T>(T defaultValue)
+        {
+            if (_data == null)
+                return defaultValue;
+
+            return (T)_data;
+        }
     }
 }
