@@ -6,5 +6,6 @@ namespace Flux.Payloads
     {
         string Action { get; }
         T Data<T>();
+        T Data<T>(T defaultValue);
     }
 }
