@@ -5,6 +5,7 @@ using System.Text;
 
 namespace Flux.Stores
 {
+    [Serializable]
     public class DispatcherNotSetException : Exception
     {
     }

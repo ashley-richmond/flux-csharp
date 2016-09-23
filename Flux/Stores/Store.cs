@@ -22,17 +22,11 @@ namespace Flux.Stores
         public DispatchToken DispatchToken { get; protected set; }
         
         public Dispatcher Dispatcher {
-            get
-            {
-                if (_dispatcher == null)
-                    throw new DispatcherNotSetException();
-
-                return _dispatcher;
-            }
+            get { return _dispatcher; }
             set
             {
                 if (_dispatcher != null)
-                    Dispose();
+                    Deregister();
 
                 _dispatcher = value;
                 DispatchToken = _dispatcher.Register(ReceiveAction);
@@ -81,12 +75,26 @@ namespace Flux.Stores
 
         ~Store()
         {
-            Dispose();
+            Dispose(false);
         }
 
         public void Dispose()
         {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        protected virtual void Dispose(bool disposing)
+        {
+            Deregister();
+        }
+
+        /// <summary>
+        /// Deregisters this store with the dispatcher, and unsets the dispatch token.
+        /// </summary>
+        protected void Deregister()
+        {
             Dispatcher.Deregister(DispatchToken);
+            DispatchToken = null;
         }
 
         /// <summary>
@@ -111,11 +119,7 @@ namespace Flux.Stores
                 .ToList()
                 .ForEach(listener => listener.Action());
         }
-
-        /// <summary>
-        /// Triggers the callbacks listening to the change event.
-        /// </summary>
-        protected void EmitChange()
+        protected void Emit()
         {
             Emit(EventType.Change);
         }
