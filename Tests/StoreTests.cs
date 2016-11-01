@@ -14,7 +14,7 @@ namespace Flux.Tests
 
             public override void ReceiveAction(IPayload payload)
             {
-                Emit(EventType.Change);
+                Emit();
             }
 
             protected override void Setup()
@@ -27,7 +27,7 @@ namespace Flux.Tests
         public void Store_OnInstantiation_RegistersCallback ()
         {
             Dispatcher dispatcher = new Dispatcher();
-            TestStore store = Store.Factory<TestStore>(dispatcher);
+            TestStore store = StoreFactory<TestStore>.GetUniqueStore(dispatcher);
 
             Assert.IsTrue(dispatcher.HasRegistered(store.DispatchToken));
         }
@@ -36,7 +36,7 @@ namespace Flux.Tests
         public void Store_OnInstantiation_RunsSetupMethod()
         {
             Dispatcher dispatcher = new Dispatcher();
-            TestStore store = Store.Factory<TestStore>(dispatcher);
+            TestStore store = StoreFactory<TestStore>.GetUniqueStore(dispatcher);
 
             Assert.IsTrue(store.SetupChecker);
         }
@@ -45,7 +45,7 @@ namespace Flux.Tests
         public void Store_OnDisposal_DeregistersCallback ()
         {
             Dispatcher dispatcher = new Dispatcher();
-            TestStore store = Store.Factory<TestStore>(dispatcher);
+            TestStore store = StoreFactory<TestStore>.GetUniqueStore(dispatcher);
             DispatchToken token = store.DispatchToken;
             store.Dispose();
 
@@ -56,7 +56,7 @@ namespace Flux.Tests
         public void Store_OnRecievePayload_EmitsEvent ()
         {
             Dispatcher dispatcher = new Dispatcher();
-            TestStore store = Store.Factory<TestStore>(dispatcher);
+            TestStore store = StoreFactory<TestStore>.GetUniqueStore(dispatcher);
 
             bool listenerHit = false;
 
@@ -76,7 +76,7 @@ namespace Flux.Tests
         public void Store_OnRemoveListener_RemovesListener ()
         {
             Dispatcher dispatcher = new Dispatcher();
-            TestStore store = Store.Factory<TestStore>(dispatcher);
+            TestStore store = StoreFactory<TestStore>.GetUniqueStore(dispatcher);
 
             int listenerHit = 0;
 
@@ -86,11 +86,27 @@ namespace Flux.Tests
             };
 
             store.AddListener(EventType.Change, testListener);
-            dispatcher.Dispatch(new Payload("wat", 4));
+            dispatcher.Dispatch("");
             store.RemoveListener(EventType.Change, testListener);
-            dispatcher.Dispatch(new Payload("wat", 4));
+            dispatcher.Dispatch("");
 
             Assert.AreEqual(1, listenerHit);
+        }
+
+        public void Store_OnRegister_SavesDispatchTokenStatic()
+        {
+            Dispatcher dispatcher = new Dispatcher();
+            StoreFactory<TestStore>.GetStore(dispatcher);
+
+            Assert.IsNotNull(StoreFactory<TestStore>.DispatchToken);
+        }
+
+        public void Store_OnRegisterUnique_SavesDispatchTokenInstanced()
+        {
+            Dispatcher dispatcher = new Dispatcher();
+            TestStore store = StoreFactory<TestStore>.GetUniqueStore(dispatcher);
+
+            Assert.IsNotNull(store.DispatchToken);
         }
     }
 }

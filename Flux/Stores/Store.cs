@@ -35,38 +35,7 @@ namespace Flux.Stores
 
         protected Dispatcher _dispatcher;
 
-        protected static Dictionary<Type, IStore> _instances = new Dictionary<Type, IStore>();
-
         private List<Listener> listeners = new List<Listener>();
-
-        /// <summary>
-        /// Create a new instance of the given store type.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="dispatcher"></param>
-        /// <returns></returns>
-        public static T Factory<T>(Dispatcher dispatcher) where T : IStore, new()
-        {
-            T instance = new T();
-            instance.Dispatcher = dispatcher;
-            return instance;
-        }
-
-        /// <summary>
-        /// Create or retrieve an instance of the given store type.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="dispatcher"></param>
-        /// <returns></returns>
-        public static T SingletonFactory<T>(Dispatcher dispatcher) where T : IStore, new()
-        {
-            Type type = typeof(T);
-
-            if (!_instances.ContainsKey(type))
-                _instances.Add(type, Factory<T>(dispatcher));
-
-            return (T)_instances[type];
-        }
 
         protected Store()
         {
@@ -115,8 +84,7 @@ namespace Flux.Stores
         protected void Emit(EventType type)
         {
             listeners
-                .Where(listener => listener.Type == type)
-                .ToList()
+                .Where(listener => listener.Type == type).ToList()
                 .ForEach(listener => listener.Action());
         }
         protected void Emit()

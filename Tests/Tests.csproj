@@ -56,6 +56,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DispatcherTests.cs" />
     <Compile Include="DispatchTokenTests.cs" />
+    <Compile Include="RandomTests.cs" />
+    <Compile Include="StoreFactoryTests.cs" />
     <Compile Include="StoreTests.cs" />
   </ItemGroup>
   <ItemGroup>
